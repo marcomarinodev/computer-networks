@@ -46,10 +46,10 @@ class MyPiCalc extends Thread{
         System.out.println("PI Finale:" + mypi);
         System.out.println("PI Reale:" + Math.PI);
         if(this.isInterrupted() == false){
-            System.out.println("Uscito perchè ho raggiunto l'accuratezza");
+            System.out.println("Uscito perchè ho raggiunto l'accuratezza in " + counter + " passi");
         }
         else {
-            System.out.println("Uscito perchè raggiunto tempo limite");
+            System.out.println("Uscito perchè raggiunto tempo limite, Ho effettuato " + counter +" passi ");
         }
     }
 }
