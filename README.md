@@ -1,2 +1,2 @@
 # computer-networks
-There are the assignments of the computer networks cs course
+These are the assignments of the computer networks cs course
