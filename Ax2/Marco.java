@@ -1,9 +1,16 @@
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -76,12 +83,26 @@ class Producer implements Runnable {
  * Post office class.
  */
 public class App {
+
+    static Logger logger = Logger.getLogger(App.class.getName());
+
     public static void main(String[] args) throws Exception {
         
         Scanner scanner = new Scanner(System.in);
         int doorsNumber = scanner.nextInt();
         int clientsNumber = scanner.nextInt();
         int k = scanner.nextInt();
+
+        // Getting the log manager with configuration
+        try {
+            LogManager.getLogManager().readConfiguration(new FileInputStream("logging.properties"));
+        } catch (SecurityException | IOException e1) { e1.printStackTrace(); }
+
+        // Setting logger level and logger handler
+        logger.setLevel(Level.FINE);
+        logger.addHandler(new ConsoleHandler());
+
+        // TODO: Read the article about logging
 
         // Create main queue, due to the fact that there's no limit for the entrance queue
         // I'm going to use a LinkedBlockingQueue
@@ -103,13 +124,13 @@ public class App {
 
         // Taking groups of k elements
         while (entranceQueue.size() >= k) {
-            System.out.println("[1] Picking a " + k + "-group from the entrance room");
+            
+            System.out.println("Picking a " + k + "-group from the entrance room");
             for (int i = 0; i < k; i++) {
                 int idPerson = entranceQueue.take();
                 System.out.println("* " + idPerson);
                 service.execute(new PersonRunnable(idPerson));
             }
-            System.out.println("[2] Picking a " + k + "-group from the entrance room");
         }
 
         // Remaining entrance people
