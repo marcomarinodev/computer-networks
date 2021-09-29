@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2021-09-29T16:56:17.115893200Z</date>
+  <millis>1632934577115</millis>
+  <nanos>893200</nanos>
+  <sequence>0</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.App</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Finished Run</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:17.682421400Z</date>
+  <millis>1632934577682</millis>
+  <nanos>421400</nanos>
+  <sequence>1</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {0} client, my job last 447</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:17.690422200Z</date>
+  <millis>1632934577690</millis>
+  <nanos>422200</nanos>
+  <sequence>2</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>16</thread>
+  <message>I'm {2} client, my job last 440</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:17.694422300Z</date>
+  <millis>1632934577694</millis>
+  <nanos>422300</nanos>
+  <sequence>3</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {4} client, my job last 1</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:17.741555500Z</date>
+  <millis>1632934577741</millis>
+  <nanos>555500</nanos>
+  <sequence>4</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>15</thread>
+  <message>I'm {1} client, my job last 507</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.043539800Z</date>
+  <millis>1632934578043</millis>
+  <nanos>539800</nanos>
+  <sequence>5</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>17</thread>
+  <message>I'm {3} client, my job last 809</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.131407700Z</date>
+  <millis>1632934578131</millis>
+  <nanos>407700</nanos>
+  <sequence>6</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {5} client, my job last 423</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.283496300Z</date>
+  <millis>1632934578283</millis>
+  <nanos>496300</nanos>
+  <sequence>7</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>15</thread>
+  <message>I'm {7} client, my job last 538</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.283496300Z</date>
+  <millis>1632934578283</millis>
+  <nanos>496300</nanos>
+  <sequence>8</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>16</thread>
+  <message>I'm {6} client, my job last 564</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.294601800Z</date>
+  <millis>1632934578294</millis>
+  <nanos>601800</nanos>
+  <sequence>9</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>17</thread>
+  <message>I'm {8} client, my job last 247</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.719583400Z</date>
+  <millis>1632934578719</millis>
+  <nanos>583400</nanos>
+  <sequence>10</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>17</thread>
+  <message>I'm {12} client, my job last 418</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:18.974376600Z</date>
+  <millis>1632934578974</millis>
+  <nanos>376600</nanos>
+  <sequence>11</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>15</thread>
+  <message>I'm {10} client, my job last 688</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:19.038577900Z</date>
+  <millis>1632934579038</millis>
+  <nanos>577900</nanos>
+  <sequence>12</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {9} client, my job last 894</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:19.116578400Z</date>
+  <millis>1632934579116</millis>
+  <nanos>578400</nanos>
+  <sequence>13</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {15} client, my job last 76</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:19.283316Z</date>
+  <millis>1632934579283</millis>
+  <nanos>316000</nanos>
+  <sequence>14</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>16</thread>
+  <message>I'm {11} client, my job last 994</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:19.594499700Z</date>
+  <millis>1632934579594</millis>
+  <nanos>499700</nanos>
+  <sequence>15</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>17</thread>
+  <message>I'm {13} client, my job last 870</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:19.877183800Z</date>
+  <millis>1632934579877</millis>
+  <nanos>183800</nanos>
+  <sequence>16</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {16} client, my job last 756</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:19.880258300Z</date>
+  <millis>1632934579880</millis>
+  <nanos>258300</nanos>
+  <sequence>17</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>15</thread>
+  <message>I'm {14} client, my job last 903</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:20.080478800Z</date>
+  <millis>1632934580080</millis>
+  <nanos>478800</nanos>
+  <sequence>18</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>14</thread>
+  <message>I'm {19} client, my job last 182</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:20.104941300Z</date>
+  <millis>1632934580104</millis>
+  <nanos>941300</nanos>
+  <sequence>19</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>16</thread>
+  <message>I'm {17} client, my job last 814</message>
+</record>
+<record>
+  <date>2021-09-29T16:56:20.153591900Z</date>
+  <millis>1632934580153</millis>
+  <nanos>591900</nanos>
+  <sequence>20</sequence>
+  <logger>com.asstwo.log.App</logger>
+  <level>INFO</level>
+  <class>com.asstwo.log.PersonRunnable</class>
+  <method>run</method>
+  <thread>17</thread>
+  <message>I'm {18} client, my job last 548</message>
+</record>
+</log>
