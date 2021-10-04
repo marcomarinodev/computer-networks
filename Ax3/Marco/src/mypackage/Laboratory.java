@@ -10,12 +10,18 @@ public class Laboratory {
     public Computer[] computers;
     final Condition isEmpty;
 
+    private void initLab() {
+        for (int i = 0; i < size; i++) {
+            computers[i] = new Computer();
+        }
+    }
 
     public Laboratory(int size) {
         this.size = size;
         availableRooms = true;
         roomLock = new ReentrantLock();
         computers = new Computer[size];
+        initLab();
         isEmpty = roomLock.newCondition();
     }
 
@@ -24,7 +30,7 @@ public class Laboratory {
      * in the room.
      * @param index: computer index
      */
-    public void undergraduateGet(int index, UndergraduateRunnable ur) throws InterruptedException {
+    public void undergraduateGet(int index, Thread user) throws InterruptedException {
         computers[index].computerLock.lock();
 
         try {
@@ -35,7 +41,7 @@ public class Laboratory {
             // set this workstation as occupied
             computers[index].occupied = true;
 
-            
+            user.start();
 
             // set this workstation as not occupied
             computers[index].occupied = false;
