@@ -54,27 +54,43 @@ class UndergraduateRunnable extends User implements Runnable {
     }
 }
 
-/*
-class ProfRunnable extends User implements Runnable {
+class StudentRunnable extends User implements Runnable {
 
-    public ProfRunnable(int id, int fromTime, int toTime) { super(id, fromTime, toTime); }
+    public StudentRunnable(int id, int fromTime, int toTime, Laboratory lab, int pos) { 
+        super(id, fromTime, toTime, lab, pos); 
+    }
 
     @Override
     public void run() {
-        work("Network job start", "Network job done",
-        ConcurrentUtils.generateRandInt(fromTime, toTime));
+        int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
+
+        try {
+			lab.studentGet(message("Studying..."), message("Study done"), randomTime);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 }
 
-class StudentRunnable extends User implements Runnable {
 
-    public StudentRunnable(int id, int fromTime, int toTime) { super(id, fromTime, toTime); }
+class ProfRunnable extends User implements Runnable {
+
+    public ProfRunnable(int id, int fromTime, int toTime, Laboratory lab, int pos) { 
+        super(id, fromTime, toTime, lab, pos); 
+    }
 
     @Override
     public void run() {
-        work("Study start", "Study done",
-        ConcurrentUtils.generateRandInt(fromTime, toTime));
+        int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
+
+        try {
+			lab.profGet(message("Studying..."), message("Study done"), randomTime);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
-} */
+}
