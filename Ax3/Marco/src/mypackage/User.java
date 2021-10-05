@@ -45,7 +45,7 @@ class UndergraduateRunnable extends User implements Runnable {
         int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
 
         try {
-			lab.undergraduateGet(pos, message("Working at thesis"), message("Work on thesis done"), randomTime);
+			lab.undergraduateGet(this, pos, message("Working at thesis"), message("Work on thesis done"), randomTime);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,7 +65,7 @@ class StudentRunnable extends User implements Runnable {
         int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
 
         try {
-			lab.studentGet(message("Studying..."), message("Study done"), randomTime);
+			lab.studentGet(this, message("Studying..."), message("Study done"), randomTime);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -86,7 +86,7 @@ class ProfRunnable extends User implements Runnable {
         int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
 
         try {
-			lab.profGet(message("Networking..."), message("Networking done"), randomTime);
+			lab.profGet(this, message("Networking..."), message("Networking done"), randomTime);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

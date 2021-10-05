@@ -1,5 +1,7 @@
 package mypackage;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.*;
 
 public class Laboratory {
@@ -8,9 +10,14 @@ public class Laboratory {
     int availableWorkstations;
     final Lock roomLock;
     public Computer[] computers;
-    final Condition isNotFull;
-    final ReentrantReadWriteLock workstationsLock;
-    final Lock roomReadLock;
+
+    final Condition studCond;
+    final Condition underCond;
+    final Condition profCond;
+
+    BlockingQueue<ProfRunnable> profsQueue;
+    BlockingQueue<UndergraduateRunnable> undergradsQueue;
+    BlockingQueue<StudentRunnable> studentsQueue;
 
     private void initLab() {
         for (int i = 0; i < size; i++) {
@@ -24,44 +31,79 @@ public class Laboratory {
         roomLock = new ReentrantLock();
         computers = new Computer[size];
         initLab();
-        isNotFull = roomLock.newCondition();
-        workstationsLock = new ReentrantReadWriteLock();
-        roomReadLock = workstationsLock.readLock();
+
+        studCond = roomLock.newCondition();
+        underCond = roomLock.newCondition();
+        profCond = roomLock.newCondition();
+
+        profsQueue = new LinkedBlockingQueue<>();
+        undergradsQueue = new LinkedBlockingQueue<>();
+        studentsQueue = new LinkedBlockingQueue<>();
     }
 
-    public void studentGet(String startMex, String endMex, int ms) throws InterruptedException {
+    public void studentGet(StudentRunnable student, String startMex, String endMex, int ms) throws InterruptedException {
 
         int chosenIndex = -1;
 
-        System.out.println("Student get");
-
-        enterLock();
+        System.out.println(student.getId() + " Student get");
 
         // read laboratory workstations in order to know
         // which workstation is free
+        roomLock.lock();
         try {
-            roomReadLock.lock();
 
-            for (int i = 0; i < computers.length; i++) {
+            System.out.println(student.getId() + " Student access LOCK");
 
-                if (!computers[i].occupied) {
-                    chosenIndex = i;
-                    System.out.println("Chosen Index for ["  + chosenIndex + "]");
-                    break;
-                }
-                
+            // not available workstations
+            while (availableWorkstations == 0) {
+                studentsQueue.add(student);
+                studCond.await();             
             }
 
+            // func to get free workstation position
+            for (int i = 0; i < computers.length; i++) {
+                if (!computers[i].occupied) {
+                    chosenIndex = i;
+                    System.out.println(student.getId() + " Chosen Index for ["  + chosenIndex + "]");
+                    break;
+                }
+            }
+
+            computers[chosenIndex].computerLock.lock();
+            computers[chosenIndex].occupied = true;
+
+            System.out.println(student.getId() + " Student studying...");
+
+            availableWorkstations--;
+
         } finally {
-            roomReadLock.unlock();
+            roomLock.unlock();
         }
 
-        assert(chosenIndex != -1);
+        ConcurrentUtils.sleep(ms);
 
-        // System.out.println("Chosen Index for ["  + chosenIndex + "]");
+        // asks for lock
+        roomLock.lock();
+        try {
+            computers[chosenIndex].computerLock.unlock();
+            computers[chosenIndex].occupied = false;
+        
+            availableWorkstations++;
 
-        usePlatform(chosenIndex, startMex, endMex, ms);
+            System.out.println("profs in queue? ->" + !profsQueue.isEmpty());
 
+            if (!profsQueue.isEmpty())
+                profCond.signal();
+            else if (!undergradsQueue.isEmpty())
+                underCond.signalAll();
+            else if (!studentsQueue.isEmpty())
+                studCond.signalAll();
+
+            System.out.println(student.getId() + " Student done");
+
+        } finally {
+            roomLock.unlock();
+        }
     }
 
     /**
@@ -69,107 +111,118 @@ public class Laboratory {
      * in the room.
      * @param index: computer index
      */
-    public void undergraduateGet(int index, String startMex, String endMex, int ms) throws InterruptedException {
-        
-        System.out.println("Undergraduate get");
+    public void undergraduateGet(UndergraduateRunnable under, int index, String startMex, String endMex, int ms) throws InterruptedException {
 
-        enterLock();
+        System.out.println(under.getId() + " Undergrad get");
 
-        usePlatform(index, startMex, endMex, ms);
-
-    }
-
-    public void profGet(String startMessage, String endMessage, int ms) throws InterruptedException {
-        
-        System.out.println("Professor get");
-
+        // read laboratory workstations in order to know
+        // which workstation is free
+        roomLock.lock();
         try {
-            roomLock.lock();
 
+            System.out.println(under.getId() + " Undergrad access LOCK");
+
+            // not available workstations
             while (availableWorkstations == 0) {
-                System.out.println("Waiting for a workstation");
-                isNotFull.await();
+                undergradsQueue.add(under);
+                underCond.await();             
             }
 
-            System.out.println(startMessage);
+            computers[index].computerLock.lock();
+            computers[index].occupied = true;
 
-            ConcurrentUtils.sleep(ms);
+            System.out.println(under.getId() + " Undergrad writing...");
 
-            System.out.println(endMessage);
-
-
-        } finally {
-            // unlock the global lock
-            roomLock.unlock();
-        }
-
-    }
-
-    public void enterLock() throws InterruptedException {
-        // reading the global lock and in particular if the room is full
-        try {
-            roomLock.lock();
-
-            while (availableWorkstations == 0) {
-                System.out.println("Waiting for a workstation");
-                isNotFull.await();
-            }
-
-            System.out.println("I can enter the room and searching the workstation");
-
-        } finally {
-            // unlock the global lock
-            roomLock.unlock();
-        }
-    }
-
-    public void usePlatform(int chosenIndex, String startMex, String endMex, int ms) throws InterruptedException {
-        try {
-            computers[chosenIndex].computerLock.lock();
-
-            // Waiting until the desired workstation is not occupied
-            while (Boolean.TRUE.equals(computers[chosenIndex].occupied)) {
-                computers[chosenIndex].notOccupied.await();
-            }
-                
-            // set this workstation as occupied
-            computers[chosenIndex].occupied = true;
             availableWorkstations--;
 
-            System.out.println(startMex);
+        } finally {
+            roomLock.unlock();
+        }
 
-            ConcurrentUtils.sleep(ms);
+        ConcurrentUtils.sleep(ms);
 
-            System.out.println(endMex);
-
-            // set this workstation as not occupied
-            computers[chosenIndex].occupied = false;
-
-            // update available workstations
+        // asks for lock
+        roomLock.lock();
+        try {
+            computers[index].computerLock.unlock();
+            computers[index].occupied = false;
+        
             availableWorkstations++;
 
-            // signaling the next user that needs this workstation
-            computers[chosenIndex].notOccupied.signal();
-            
+            System.out.println("profs in queue? ->" + !profsQueue.isEmpty());
 
-            try {
-                roomLock.lock();
+            if (!profsQueue.isEmpty())
+                profCond.signal();
+            else if (!undergradsQueue.isEmpty())
+                underCond.signalAll();
+            else if (!studentsQueue.isEmpty())
+                studCond.signalAll();
 
-                System.out.println("Waking up a user (student/undergrad)");
+            System.out.println(under.getId() + " Undergrad done");
 
-                isNotFull.signal();
-    
-            } finally {
-                // unlock the global lock
-                roomLock.unlock();
+        } finally {
+            roomLock.unlock();
+        }
+    }
+
+    public void profGet(ProfRunnable prof, String startMessage, String endMessage, int ms) throws InterruptedException {
+
+        System.out.println(prof.getId() + " Prof get");
+
+        // read laboratory workstations in order to know
+        // which workstation is free
+        roomLock.lock();
+        try {
+
+            System.out.println(prof.getId() + " Prof access LOCK");
+
+            // not available workstations
+            while (availableWorkstations != size) {
+                System.out.println(prof.getId() + " Prof stopped because not all workstations are available");
+                profsQueue.add(prof);
+                profCond.await();             
             }
 
-        
-        } finally {
+            for (Computer pc : this.computers) {
+                pc.computerLock.lock();
+                pc.occupied = true;
+            }
 
-            // then unlock the workstation
-            computers[chosenIndex].computerLock.unlock();
+            System.out.println(prof.getId() + " Prof networking...");
+
+            availableWorkstations = 0;
+
+        } finally {
+            roomLock.unlock();
         }
+
+        ConcurrentUtils.sleep(ms);
+
+        // asks for lock
+        roomLock.lock();
+        try {
+            for (Computer pc : this.computers) {
+                pc.computerLock.unlock();
+                pc.occupied = false;
+            }
+        
+            availableWorkstations = size;
+
+            System.out.println("profs in queue? ->" + !profsQueue.isEmpty());
+
+            if (!profsQueue.isEmpty())
+                profCond.signal();
+            else if (!undergradsQueue.isEmpty())
+                underCond.signalAll();
+            else if (!studentsQueue.isEmpty())
+                studCond.signalAll();
+
+            System.out.println(prof.getId() + " Prof done");
+
+        } finally {
+            roomLock.unlock();
+        }
+
     }
     
 }
