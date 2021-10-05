@@ -1,6 +1,5 @@
 package mypackage;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.*;
 
 public class Laboratory {
@@ -98,6 +97,7 @@ public class Laboratory {
 
             System.out.println(endMessage);
 
+
         } finally {
             // unlock the global lock
             roomLock.unlock();
@@ -134,7 +134,7 @@ public class Laboratory {
                 
             // set this workstation as occupied
             computers[chosenIndex].occupied = true;
-            availableWorkstations++;
+            availableWorkstations--;
 
             System.out.println(startMex);
 
@@ -146,7 +146,7 @@ public class Laboratory {
             computers[chosenIndex].occupied = false;
 
             // update available workstations
-            availableWorkstations--;
+            availableWorkstations++;
 
             // signaling the next user that needs this workstation
             computers[chosenIndex].notOccupied.signal();

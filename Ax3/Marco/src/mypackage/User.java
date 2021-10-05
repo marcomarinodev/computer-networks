@@ -86,7 +86,7 @@ class ProfRunnable extends User implements Runnable {
         int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
 
         try {
-			lab.profGet(message("Studying..."), message("Study done"), randomTime);
+			lab.profGet(message("Networking..."), message("Networking done"), randomTime);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

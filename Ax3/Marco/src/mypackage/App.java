@@ -21,6 +21,11 @@ public class App {
         BlockingQueue<Thread> studentsQueue = new ArrayBlockingQueue<>(3);
 
         // Simulate the stream of users
+        Thread prof1 = new Thread (new ProfRunnable(-1, 500, 10000, lab, -1));
+        Thread prof2 = new Thread (new ProfRunnable(-2, 1000, 3000, lab, -1));
+        Thread prof3 = new Thread (new ProfRunnable(-3, 1000, 3000, lab, -1));
+
+
         Thread user = new Thread (new UndergraduateRunnable(0, 2000, 4000, lab, 5));
         Thread user1 = new Thread (new UndergraduateRunnable(1, 3000, 5000, lab, 5));
         Thread user2 = new Thread (new UndergraduateRunnable(2, 1000, 2000, lab, 5));
@@ -32,6 +37,10 @@ public class App {
         Thread stud2 = new Thread (new StudentRunnable(8, 500, 2000, lab, -1));
         Thread stud3 = new Thread (new StudentRunnable(8, 500, 2000, lab, -1));
         
+        profsQueue.add(prof1);
+        profsQueue.add(prof2);
+        profsQueue.add(prof3);
+
         undergradsQueue.add(user);
         undergradsQueue.add(user1);
         undergradsQueue.add(user2);
@@ -47,9 +56,15 @@ public class App {
         // user4.start();
         // user5.start();
         // user6.start();
+
+        prof1.start();
+        prof2.start();
+
         stud.start();
         stud2.start();
         stud3.start();
+
+        prof3.start();
 
         user.join();
         user1.join();
@@ -61,6 +76,10 @@ public class App {
         stud.join();
         stud2.join();
         stud3.join();
+
+        prof1.join();
+        prof2.join();
+        prof3.join();
 
         assert(lab.availableWorkstations == 0);
     
