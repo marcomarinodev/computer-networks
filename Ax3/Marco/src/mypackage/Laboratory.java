@@ -55,7 +55,6 @@ public class Laboratory {
 
             // Waiting until the desired workstation is not occupied
             while (Boolean.TRUE.equals(computers[index].occupied)) {
-                System.out.println("This workstation is occupied");
                 computers[index].notOccupied.await();
             }
                 
@@ -74,6 +73,7 @@ public class Laboratory {
             computers[index].occupied = false;
 
             // update available workstations
+            availableWorkstations--;
 
             // signaling the next user that needs this workstation
             computers[index].notOccupied.signal();
