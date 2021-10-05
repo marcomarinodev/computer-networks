@@ -1,14 +1,18 @@
 package mypackage;
 
 public class User {
-    private int id;
+    int id;
     int fromTime;
     int toTime;
+    Laboratory lab;
+    int pos;
 
-    public User(int id, int fromTime, int toTime) {
+    public User(int id, int fromTime, int toTime, Laboratory lab, int pos) {
         this.id = id;
         this.fromTime = fromTime;
         this.toTime = toTime;
+        this.lab = lab;
+        this.pos = pos;
     }
 
     public void printInfo() {
@@ -19,31 +23,38 @@ public class User {
         return "[" + id + "]";
     }
 
-    public void work(String startMessage, String endMessage, int ms) {
+    public String message(String mex) {
         // print start message
-        System.out.println(getId() + startMessage);
-
-        // doing work...
-        ConcurrentUtils.sleep(ms);
-
-        // print exit message
-        System.out.println(getId() + endMessage);
-
+        return getId() + mex;
     }
 
 }
 
 class UndergraduateRunnable extends User implements Runnable {
 
-    public UndergraduateRunnable(int id, int fromTime, int toTime) { super(id, fromTime, toTime); }
+    public UndergraduateRunnable(
+        int id,
+        int fromTime,
+        int toTime,
+        Laboratory lab,
+        int pos
+    ) { super(id, fromTime, toTime, lab, pos); }
 
     @Override
     public void run() {
-        work("Working at thesis", "Work on thesis done",
-        ConcurrentUtils.generateRandInt(fromTime, toTime));
+        int randomTime = ConcurrentUtils.generateRandInt(fromTime, toTime);
+
+        try {
+			lab.undergraduateGet(pos, message("Working at thesis"), message("Work on thesis done"), randomTime);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
     }
 }
 
+/*
 class ProfRunnable extends User implements Runnable {
 
     public ProfRunnable(int id, int fromTime, int toTime) { super(id, fromTime, toTime); }
@@ -66,4 +77,4 @@ class StudentRunnable extends User implements Runnable {
         ConcurrentUtils.generateRandInt(fromTime, toTime));
     }
 
-}
+} */

@@ -5,10 +5,10 @@ import java.util.concurrent.locks.*;
 public class Laboratory {
 
     final int size;
-    Boolean availableRooms;
+    int availableWorkstations;
     final Lock roomLock;
     public Computer[] computers;
-    final Condition isEmpty;
+    final Condition isNotFull;
 
     private void initLab() {
         for (int i = 0; i < size; i++) {
@@ -18,11 +18,11 @@ public class Laboratory {
 
     public Laboratory(int size) {
         this.size = size;
-        availableRooms = true;
+        availableWorkstations = size;
         roomLock = new ReentrantLock();
         computers = new Computer[size];
         initLab();
-        isEmpty = roomLock.newCondition();
+        isNotFull = roomLock.newCondition();
     }
 
     /**
@@ -30,26 +30,67 @@ public class Laboratory {
      * in the room.
      * @param index: computer index
      */
-    public void undergraduateGet(int index, Thread user) throws InterruptedException {
-        computers[index].computerLock.lock();
+    public void undergraduateGet(int index, String startMex, String endMex, int ms) throws InterruptedException {
+        
+        System.out.println("Undergraduate get");
+
+        // reading the global lock and in particular if the room is full
+        try {
+            roomLock.lock();
+
+            while (availableWorkstations == 0) {
+                System.out.println("Waiting for a workstation");
+                isNotFull.await();
+            }
+
+            System.out.println("I can enter the room and searching the workstation");
+
+        } finally {
+            // unlock the global lock
+            roomLock.unlock();
+        }
 
         try {
+            computers[index].computerLock.lock();
+
             // Waiting until the desired workstation is not occupied
-            while (Boolean.TRUE.equals(computers[index].occupied))
+            while (Boolean.TRUE.equals(computers[index].occupied)) {
+                System.out.println("This workstation is occupied");
                 computers[index].notOccupied.await();
+            }
+                
             
             // set this workstation as occupied
             computers[index].occupied = true;
+            availableWorkstations++;
 
-            user.start();
+            System.out.println(startMex);
+
+            ConcurrentUtils.sleep(ms);
+
+            System.out.println(endMex);
 
             // set this workstation as not occupied
             computers[index].occupied = false;
 
+            // update available workstations
+
             // signaling the next user that needs this workstation
             computers[index].notOccupied.signal();
             
-            return;
+
+            try {
+                roomLock.lock();
+
+                System.out.println("Waking up a user (student/undergrad)");
+
+                isNotFull.signal();
+    
+            } finally {
+                // unlock the global lock
+                roomLock.unlock();
+            }
+
         
         } finally {
 
