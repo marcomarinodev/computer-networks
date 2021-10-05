@@ -1,7 +1,5 @@
 package mypackage;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.*;
 
 public class Laboratory {
@@ -15,9 +13,9 @@ public class Laboratory {
     final Condition underCond;
     final Condition profCond;
 
-    BlockingQueue<ProfRunnable> profsQueue;
-    BlockingQueue<UndergraduateRunnable> undergradsQueue;
-    BlockingQueue<StudentRunnable> studentsQueue;
+    int profsInPending;
+    int undergradInPending;
+    int studentsInPending;
 
     private void initLab() {
         for (int i = 0; i < size; i++) {
@@ -36,9 +34,9 @@ public class Laboratory {
         underCond = roomLock.newCondition();
         profCond = roomLock.newCondition();
 
-        profsQueue = new LinkedBlockingQueue<>();
-        undergradsQueue = new LinkedBlockingQueue<>();
-        studentsQueue = new LinkedBlockingQueue<>();
+        profsInPending = 0;
+        undergradInPending = 0;
+        studentsInPending = 0;
     }
 
     public void studentGet(StudentRunnable student, String startMex, String endMex, int ms) throws InterruptedException {
@@ -55,9 +53,10 @@ public class Laboratory {
             System.out.println(student.getId() + " Student access LOCK");
 
             // not available workstations
-            while (availableWorkstations == 0) {
-                studentsQueue.add(student);
-                studCond.await();             
+            while (availableWorkstations == 0 || profsInPending > 0) {
+                studentsInPending++;
+                studCond.await();   
+                studentsInPending--;          
             }
 
             // func to get free workstation position
@@ -90,13 +89,13 @@ public class Laboratory {
         
             availableWorkstations++;
 
-            System.out.println("profs in queue? ->" + !profsQueue.isEmpty());
+            System.out.println("profs in queue? ->" + (profsInPending != 0));
 
-            if (!profsQueue.isEmpty())
+            if (profsInPending != 0)
                 profCond.signal();
-            else if (!undergradsQueue.isEmpty())
+            else if (undergradInPending != 0)
                 underCond.signalAll();
-            else if (!studentsQueue.isEmpty())
+            else if (studentsInPending != 0)
                 studCond.signalAll();
 
             System.out.println(student.getId() + " Student done");
@@ -123,9 +122,10 @@ public class Laboratory {
             System.out.println(under.getId() + " Undergrad access LOCK");
 
             // not available workstations
-            while (availableWorkstations == 0) {
-                undergradsQueue.add(under);
-                underCond.await();             
+            while (availableWorkstations == 0 || profsInPending > 0) {
+                undergradInPending++;
+                underCond.await();  
+                undergradInPending--;           
             }
 
             computers[index].computerLock.lock();
@@ -149,13 +149,13 @@ public class Laboratory {
         
             availableWorkstations++;
 
-            System.out.println("profs in queue? ->" + !profsQueue.isEmpty());
+            System.out.println("profs in queue? ->" + (profsInPending != 0));
 
-            if (!profsQueue.isEmpty())
+            if (profsInPending != 0)
                 profCond.signal();
-            else if (!undergradsQueue.isEmpty())
+            else if (undergradInPending != 0)
                 underCond.signalAll();
-            else if (!studentsQueue.isEmpty())
+            else if (studentsInPending != 0)
                 studCond.signalAll();
 
             System.out.println(under.getId() + " Undergrad done");
@@ -179,8 +179,9 @@ public class Laboratory {
             // not available workstations
             while (availableWorkstations != size) {
                 System.out.println(prof.getId() + " Prof stopped because not all workstations are available");
-                profsQueue.add(prof);
-                profCond.await();             
+                profsInPending++;
+                profCond.await(); 
+                profsInPending--;            
             }
 
             for (Computer pc : this.computers) {
@@ -208,13 +209,13 @@ public class Laboratory {
         
             availableWorkstations = size;
 
-            System.out.println("profs in queue? ->" + !profsQueue.isEmpty());
+            System.out.println("profs in queue? ->" + (profsInPending != 0));
 
-            if (!profsQueue.isEmpty())
+            if (profsInPending != 0)
                 profCond.signal();
-            else if (!undergradsQueue.isEmpty())
+            else if (undergradInPending != 0)
                 underCond.signalAll();
-            else if (!studentsQueue.isEmpty())
+            else if (studentsInPending != 0)
                 studCond.signalAll();
 
             System.out.println(prof.getId() + " Prof done");
