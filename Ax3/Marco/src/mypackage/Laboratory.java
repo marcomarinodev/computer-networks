@@ -20,12 +20,12 @@ public class Laboratory {
     int undergradInPending;
     int studentsInPending;
 
-    int nProf;
-    int nUnder;
-    int nStud;
+    final int nProf;
+    final int nUnder;
+    final int nStud;
 
     List<Runnable> usersRunnable;
-    int k;
+    final int k;
 
     private void initLab() {
         for (int i = 0; i < size; i++) {
@@ -78,18 +78,16 @@ public class Laboratory {
 
         List<Thread> threads = new ArrayList<>(usersRunnable.size());
 
-        for (Runnable userRunnable : usersRunnable) {
-            Thread userThread = new Thread(userRunnable);
-            threads.add(userThread);
-
-            userThread.start();
-
-            ConcurrentUtils.sleep(300);
+        for (int i = 0; i < k; i++) {
+            for (Runnable userRunnable : usersRunnable) {
+                Thread userThread = new Thread(userRunnable);
+                threads.add(userThread);
+    
+                userThread.start();
+    
+                ConcurrentUtils.sleep(500);
+            }
         }
-
-        // for (Thread thread : threads) {
-        //     thread.join();
-        // }
 
     }
 
