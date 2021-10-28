@@ -4,14 +4,13 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 class CustomService implements Runnable {
 
-    private Socket socket;
+    private final Socket socket;
     static final String NOT_FOUND_PAGE = "err.html";
     static final String currentPath = System.getProperty("user.dir");
 
@@ -35,7 +34,7 @@ class CustomService implements Runnable {
 
             // Analyze the request
             // Get -> /file.extension
-            List<String> request = new LinkedList<>();
+            String filename = "";
             String line;
             StringBuilder content = new StringBuilder();
             int i = 0;
@@ -45,10 +44,11 @@ class CustomService implements Runnable {
 
             tokenizer = new StringTokenizer(content.toString());
             while (i < 2 && tokenizer.hasMoreTokens()) {
-                request.add(tokenizer.nextToken());
+                filename = tokenizer.nextToken();
+                i++;
             }
 
-            File file = new File(currentPath + "/resources" + request.get(1));
+            File file = new File(currentPath + "/resources" + filename);
             byte[] fileData = readFileData(file, (int) file.length());
 
             out.println("HTTP/1.1 200 OK");
@@ -61,11 +61,15 @@ class CustomService implements Runnable {
             dataOut.flush();
 
         } catch (FileNotFoundException err) {
+            assert out != null;
+            assert dataOut != null;
             handleFileNotFound(out, dataOut);
-
         } catch (IOException e) {
             System.out.println("Server error: " + e);
         } finally {
+            assert in != null;
+            assert out != null;
+            assert dataOut != null;
             closeConn(in, out, dataOut);
         }
 
@@ -102,16 +106,6 @@ class CustomService implements Runnable {
         }
     }
 
-    private boolean isValidHttp(List<String> request) {
-        if (request.size() <= 0)
-            return false;
-
-        if (request.get(0).equals("GET"))
-            return true;
-
-        return false;
-    }
-
     private byte[] readFileData(File file, int fileLength) throws IOException {
         FileInputStream fileIn = null;
         byte[] fileData = new byte[fileLength];
@@ -133,7 +127,7 @@ public class Main {
 
     public final static int PORT = 6789;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         try {
             InetAddress localAddress = InetAddress.getLocalHost();
