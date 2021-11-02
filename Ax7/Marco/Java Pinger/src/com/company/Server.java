@@ -1,23 +1,86 @@
 package com.company;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.nio.charset.StandardCharsets;
+import java.util.Random;
+
+import static java.lang.Thread.sleep;
 
 public class Server {
 
     public static void main(String[] args) throws Exception {
 
+       // if (badArgs(args)) return;
+
         DatagramSocket serverSock = new DatagramSocket(40000);
-        byte[] buffer = new byte[128];
-        DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+        byte[] buffer = new byte[100];
+        DatagramPacket receiverPacket = new DatagramPacket(buffer, buffer.length);
+        String mode;
+        long seqnum;
+        long delay;
+        long finalDelay;
 
         while (true) {
             System.out.println("Listening...");
-            serverSock.receive(receivedPacket);
-            String byteToString = new String(receivedPacket.getData(),
-                    0, receivedPacket.getLength(), StandardCharsets.UTF_8);
-            System.out.println(byteToString);
+            for (int i = 0; i < 10; i++) {
+
+                // Generating delay
+                //Random ran = new Random(Integer.valueOf(args[1]));
+                Random ran = new Random(123);
+
+                serverSock.receive(receiverPacket);
+                ByteArrayInputStream bais = new ByteArrayInputStream(receiverPacket.getData(),
+                        0, receiverPacket.getLength());
+                DataInputStream dis = new DataInputStream(bais);
+                mode = dis.readUTF();
+
+                serverSock.receive(receiverPacket);
+                bais = new ByteArrayInputStream(receiverPacket.getData(),
+                        0, receiverPacket.getLength());
+                dis = new DataInputStream(bais);
+                seqnum = dis.readLong();
+
+                serverSock.receive(receiverPacket);
+                bais = new ByteArrayInputStream(receiverPacket.getData(),
+                        0, receiverPacket.getLength());
+                dis = new DataInputStream(bais);
+
+                sleep(Math.abs(ran.nextInt()) % 1000);
+
+                finalDelay = System.currentTimeMillis() - dis.readLong();
+
+                System.out.println(receiverPacket.getAddress() + ":" +
+                        receiverPacket.getPort() + "> " + mode + " " + i + " " + seqnum + " ACTION: " +
+                        "-" + " " + finalDelay + " ms");
+            }
         }
+    }
+
+    private static boolean badArgs(String[] args) {
+        if (args.length < 2) {
+            System.out.println("You need to insert: server name and its port");
+            return true;
+        }
+
+        if (checkPort(args[0])) {
+            System.out.println("ERR -arg port");
+            return true;
+        }
+
+        if (checkSeed(args[1])) {
+            System.out.println("ERR -arg seed");
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean checkSeed(String arg) {
+        return Integer.valueOf(arg) > 0;
+    }
+
+    private static boolean checkPort(String arg) {
+        return Integer.valueOf(arg) > 1023;
     }
 }

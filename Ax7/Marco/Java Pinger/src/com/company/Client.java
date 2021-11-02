@@ -1,11 +1,12 @@
 package com.company;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 
 class Main {
 
@@ -33,14 +34,40 @@ class Main {
 		}
 
 		try (DatagramSocket socket = new DatagramSocket(0)) {
-			byte[] incomingData = "CiaoSonoMarco".getBytes(StandardCharsets.UTF_8);
-			DatagramPacket request = new DatagramPacket(incomingData, incomingData.length, host, port);
-			byte[] data = new byte[1024];
-			DatagramPacket response = new DatagramPacket(data, data.length);
 
-			socket.send(request);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			DataOutputStream dos = new DataOutputStream(baos);
+			byte[] data = new byte[100];
+			DatagramPacket req = new DatagramPacket(data, data.length, host, port);
 
-			socket.receive(request);
+			for (int i = 0; i < 10; i++) {
+				long now = System.currentTimeMillis();
+
+				dos.writeUTF("PING");
+				data = baos.toByteArray();
+				req.setData(data, 0, data.length);
+				req.setLength(data.length);
+				socket.send(req);
+				baos.reset();
+
+				dos.writeLong(1234);
+				data = baos.toByteArray();
+				req.setData(data, 0, data.length);
+				req.setLength(data.length);
+				socket.send(req);
+				baos.reset();
+
+				dos.writeLong(System.currentTimeMillis());
+				data = baos.toByteArray();
+				req.setData(data, 0, data.length);
+				req.setLength(data.length);
+				socket.send(req);
+				baos.reset();
+
+
+//				System.out.println("PING " + i + " RTT: " + (System.currentTimeMillis() - now) + " ms");
+
+			}
 
 			System.out.println("--- PING Statistics ---");
 
