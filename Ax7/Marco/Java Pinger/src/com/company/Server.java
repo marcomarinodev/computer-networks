@@ -1,7 +1,9 @@
 package com.company;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.Random;
@@ -50,6 +52,17 @@ public class Server {
                 sleep(Math.abs(ran.nextInt()) % 1000);
 
                 finalDelay = System.currentTimeMillis() - dis.readLong();
+
+                DatagramPacket req = new DatagramPacket(buffer, buffer.length, receiverPacket.getAddress(), receiverPacket.getPort());
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                DataOutputStream dos = new DataOutputStream(baos);
+
+                dos.writeUTF("Send it back");
+                buffer = baos.toByteArray();
+                req.setData(buffer, 0, buffer.length);
+                req.setLength(buffer.length);
+                serverSock.send(req);
+                baos.reset();
 
                 System.out.println(receiverPacket.getAddress() + ":" +
                         receiverPacket.getPort() + "> " + mode + " " + i + " " + seqnum + " ACTION: " +

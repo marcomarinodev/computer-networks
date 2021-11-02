@@ -1,8 +1,6 @@
 package com.company;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -39,6 +37,7 @@ class Main {
 			DataOutputStream dos = new DataOutputStream(baos);
 			byte[] data = new byte[100];
 			DatagramPacket req = new DatagramPacket(data, data.length, host, port);
+			DatagramPacket receiverPacket = new DatagramPacket(data, data.length);
 
 			for (int i = 0; i < 10; i++) {
 				long now = System.currentTimeMillis();
@@ -64,6 +63,16 @@ class Main {
 				socket.send(req);
 				baos.reset();
 
+				ByteArrayInputStream bais = new ByteArrayInputStream(receiverPacket.getData(),
+						0, receiverPacket.getLength());
+				DataInputStream dis = new DataInputStream(bais);
+				socket.receive(receiverPacket);
+				bais = new ByteArrayInputStream(receiverPacket.getData(),
+						0, receiverPacket.getLength());
+				dis = new DataInputStream(bais);
+				String response = dis.readUTF();
+
+				System.out.println(response);
 
 //				System.out.println("PING " + i + " RTT: " + (System.currentTimeMillis() - now) + " ms");
 
