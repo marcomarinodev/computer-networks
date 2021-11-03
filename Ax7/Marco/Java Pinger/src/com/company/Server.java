@@ -14,14 +14,13 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
 
-       // if (badArgs(args)) return;
+        if (badArgs(args)) return;
 
         DatagramSocket serverSock = new DatagramSocket(40000);
         byte[] buffer = new byte[100];
         DatagramPacket receiverPacket = new DatagramPacket(buffer, buffer.length);
         String mode;
         long seqnum;
-        long delay;
         long finalDelay;
 
         while (true) {
@@ -29,8 +28,9 @@ public class Server {
             for (int i = 0; i < 10; i++) {
 
                 // Generating delay
-                //Random ran = new Random(Integer.valueOf(args[1]));
-                Random ran = new Random(123);
+                Random ran = new Random(Integer.valueOf(args[1]));
+                // Random ran = new Random(123);
+                boolean willSend = getRandomBoolean(Math.abs(ran.nextInt()) % 100);
 
                 serverSock.receive(receiverPacket);
                 ByteArrayInputStream bais = new ByteArrayInputStream(receiverPacket.getData(),
@@ -61,12 +61,20 @@ public class Server {
                 buffer = baos.toByteArray();
                 req.setData(buffer, 0, buffer.length);
                 req.setLength(buffer.length);
-                serverSock.send(req);
+
+                if (willSend) serverSock.send(req);
                 baos.reset();
 
-                System.out.println(receiverPacket.getAddress() + ":" +
-                        receiverPacket.getPort() + "> " + mode + " " + i + " " + seqnum + " ACTION: " +
-                        "-" + " " + finalDelay + " ms");
+                if (willSend) {
+                    System.out.println(receiverPacket.getAddress() + ":" +
+                            receiverPacket.getPort() + "> " + mode + " " + i + " " + seqnum + " ACTION: " +
+                            "delayed" + " " + finalDelay + " ms");
+                } else {
+                    System.out.println(receiverPacket.getAddress() + ":" +
+                            receiverPacket.getPort() + "> " + mode + " " + i + " " + seqnum + " ACTION: " +
+                            "not sent");
+                }
+
             }
         }
     }
@@ -95,5 +103,14 @@ public class Server {
 
     private static boolean checkPort(String arg) {
         return Integer.valueOf(arg) > 1023;
+    }
+
+    static boolean getRandomBoolean(float probability) {
+        double randomValue = Math.random() * 100;
+
+        // System.out.println("Probability: " + probability);
+        // System.out.println("RandomValue: " + randomValue);
+
+        return randomValue >= probability;
     }
 }

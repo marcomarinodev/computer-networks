@@ -31,15 +31,23 @@ class Main {
 			return;
 		}
 
-		try (DatagramSocket socket = new DatagramSocket(0)) {
+		int received = 0;
+		int totalDelay = 0;
+		double minRTT = Double.POSITIVE_INFINITY;
+		double maxRTT = Double.NEGATIVE_INFINITY;
+		double avgRTT = 0;
 
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			DataOutputStream dos = new DataOutputStream(baos);
-			byte[] data = new byte[100];
-			DatagramPacket req = new DatagramPacket(data, data.length, host, port);
-			DatagramPacket receiverPacket = new DatagramPacket(data, data.length);
+		for (int i = 0; i < 10; i++) {
+			try (DatagramSocket socket = new DatagramSocket(52477)) {
 
-			for (int i = 0; i < 10; i++) {
+				socket.setSoTimeout(2000);
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				DataOutputStream dos = new DataOutputStream(baos);
+				byte[] data = new byte[100];
+				DatagramPacket req = new DatagramPacket(data, data.length, host, port);
+				DatagramPacket receiverPacket = new DatagramPacket(data, data.length);
+
 				long now = System.currentTimeMillis();
 
 				dos.writeUTF("PING");
@@ -49,7 +57,7 @@ class Main {
 				socket.send(req);
 				baos.reset();
 
-				dos.writeLong(1234);
+				dos.writeLong(i);
 				data = baos.toByteArray();
 				req.setData(data, 0, data.length);
 				req.setLength(data.length);
@@ -67,22 +75,29 @@ class Main {
 						0, receiverPacket.getLength());
 				DataInputStream dis = new DataInputStream(bais);
 				socket.receive(receiverPacket);
-				bais = new ByteArrayInputStream(receiverPacket.getData(),
-						0, receiverPacket.getLength());
-				dis = new DataInputStream(bais);
-				String response = dis.readUTF();
+				// bais = new ByteArrayInputStream(receiverPacket.getData(),
+						// 0, receiverPacket.getLength());
+				// dis = new DataInputStream(bais);
+				// String response = dis.readUTF();
 
-				System.out.println(response);
+				long delta = System.currentTimeMillis() - now;
+ 				System.out.println("PING " + i + " RTT: " + delta + " ms");
+				received++;
+				totalDelay += delta;
+				minRTT = Math.min(minRTT, delta);
+				maxRTT = Math.max(maxRTT, delta);
+				avgRTT = totalDelay / received;
 
-//				System.out.println("PING " + i + " RTT: " + (System.currentTimeMillis() - now) + " ms");
-
+			} catch (IOException ex) {
+				System.out.println("PING " + i + " RTT: *");
 			}
-
-			System.out.println("--- PING Statistics ---");
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
 		}
+
+		System.out.println("--- PING Statistics ---");
+		System.out.println("10 packets transmitted, " + received + " packets received, " +
+				(100 - (received * 10)) + "% packet loss");
+		System.out.println("round-trip (ms) min/avg/max = " + (int) minRTT + "/" + avgRTT + "/" +
+				(int) maxRTT);
 
 	}
 
