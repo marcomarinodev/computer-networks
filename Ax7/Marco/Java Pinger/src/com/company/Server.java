@@ -16,7 +16,7 @@ public class Server {
 
         if (badArgs(args)) return;
 
-        DatagramSocket serverSock = new DatagramSocket(40000);
+        DatagramSocket serverSock = new DatagramSocket(Integer.valueOf(args[0]));
         byte[] buffer = new byte[100];
         DatagramPacket receiverPacket = new DatagramPacket(buffer, buffer.length);
         String mode;
@@ -98,11 +98,11 @@ public class Server {
     }
 
     private static boolean checkSeed(String arg) {
-        return Integer.valueOf(arg) > 0;
+        return Integer.valueOf(arg) < 0;
     }
 
     private static boolean checkPort(String arg) {
-        return Integer.valueOf(arg) > 1023;
+        return Integer.valueOf(arg) < 1023;
     }
 
     static boolean getRandomBoolean(float probability) {

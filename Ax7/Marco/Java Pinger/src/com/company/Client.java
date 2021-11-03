@@ -38,6 +38,8 @@ class Main {
 		double avgRTT = 0;
 
 		for (int i = 0; i < 10; i++) {
+			long now = System.currentTimeMillis();
+
 			try (DatagramSocket socket = new DatagramSocket(52477)) {
 
 				socket.setSoTimeout(2000);
@@ -48,8 +50,6 @@ class Main {
 				DatagramPacket req = new DatagramPacket(data, data.length, host, port);
 				DatagramPacket receiverPacket = new DatagramPacket(data, data.length);
 
-				long now = System.currentTimeMillis();
-
 				dos.writeUTF("PING");
 				data = baos.toByteArray();
 				req.setData(data, 0, data.length);
@@ -57,7 +57,7 @@ class Main {
 				socket.send(req);
 				baos.reset();
 
-				dos.writeLong(i);
+				dos.writeLong(now);
 				data = baos.toByteArray();
 				req.setData(data, 0, data.length);
 				req.setLength(data.length);
@@ -81,7 +81,7 @@ class Main {
 				// String response = dis.readUTF();
 
 				long delta = System.currentTimeMillis() - now;
- 				System.out.println("PING " + i + " RTT: " + delta + " ms");
+ 				System.out.println("PING " + i + " " + now + " RTT: " + delta + " ms");
 				received++;
 				totalDelay += delta;
 				minRTT = Math.min(minRTT, delta);
@@ -89,7 +89,7 @@ class Main {
 				avgRTT = totalDelay / received;
 
 			} catch (IOException ex) {
-				System.out.println("PING " + i + " RTT: *");
+				System.out.println("PING " + i + " " + now + " RTT: *");
 			}
 		}
 
